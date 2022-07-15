@@ -10,6 +10,8 @@
 [0m[[0m[0mdebug[0m] [0m[0m	  /Users/jaehyun/Documents/KAIST/PLRG/Toy/minic/target/scala-2.13/classes/miniC/miniCLabelAST$InL.class[0m
 [0m[[0m[0mdebug[0m] [0m[0m	miniC/Main$.class[0m
 [0m[[0m[0mdebug[0m] [0m[0m	  /Users/jaehyun/Documents/KAIST/PLRG/Toy/minic/target/scala-2.13/classes/miniC/Main$.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	miniC/miniCLabelAST$EOP.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /Users/jaehyun/Documents/KAIST/PLRG/Toy/minic/target/scala-2.13/classes/miniC/miniCLabelAST$EOP.class[0m
 [0m[[0m[0mdebug[0m] [0m[0m	miniC/miniCParser.class[0m
 [0m[[0m[0mdebug[0m] [0m[0m	  /Users/jaehyun/Documents/KAIST/PLRG/Toy/minic/target/scala-2.13/classes/miniC/miniCParser.class[0m
 [0m[[0m[0mdebug[0m] [0m[0m	miniC/miniCParser$ProgramParser$.class[0m
@@ -36,6 +38,8 @@
 [0m[[0m[0mdebug[0m] [0m[0m	  /Users/jaehyun/Documents/KAIST/PLRG/Toy/minic/target/scala-2.13/classes/miniC/miniCError$AnalyzeError$.class[0m
 [0m[[0m[0mdebug[0m] [0m[0m	miniC/miniCAST$Assign.class[0m
 [0m[[0m[0mdebug[0m] [0m[0m	  /Users/jaehyun/Documents/KAIST/PLRG/Toy/minic/target/scala-2.13/classes/miniC/miniCAST$Assign.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	miniC/miniCLabelAST$SOP.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /Users/jaehyun/Documents/KAIST/PLRG/Toy/minic/target/scala-2.13/classes/miniC/miniCLabelAST$SOP.class[0m
 [0m[[0m[0mdebug[0m] [0m[0m	miniC/miniCAST$Program.class[0m
 [0m[[0m[0mdebug[0m] [0m[0m	  /Users/jaehyun/Documents/KAIST/PLRG/Toy/minic/target/scala-2.13/classes/miniC/miniCAST$Program.class[0m
 [0m[[0m[0mdebug[0m] [0m[0m	miniC/miniCAST$Bool.class[0m
@@ -78,6 +82,8 @@
 [0m[[0m[0mdebug[0m] [0m[0m	  /Users/jaehyun/Documents/KAIST/PLRG/Toy/minic/target/scala-2.13/classes/miniC/miniCAST$Branch.class[0m
 [0m[[0m[0mdebug[0m] [0m[0m	miniC/miniCAST$Assign$.class[0m
 [0m[[0m[0mdebug[0m] [0m[0m	  /Users/jaehyun/Documents/KAIST/PLRG/Toy/minic/target/scala-2.13/classes/miniC/miniCAST$Assign$.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	miniC/miniCLabelAST$SOP$.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /Users/jaehyun/Documents/KAIST/PLRG/Toy/minic/target/scala-2.13/classes/miniC/miniCLabelAST$SOP$.class[0m
 [0m[[0m[0mdebug[0m] [0m[0m	miniC/miniCAST$While$.class[0m
 [0m[[0m[0mdebug[0m] [0m[0m	  /Users/jaehyun/Documents/KAIST/PLRG/Toy/minic/target/scala-2.13/classes/miniC/miniCAST$While$.class[0m
 [0m[[0m[0mdebug[0m] [0m[0m	miniC/miniCLabelAST$WhileL$.class[0m
@@ -128,6 +134,8 @@
 [0m[[0m[0mdebug[0m] [0m[0m	  /Users/jaehyun/Documents/KAIST/PLRG/Toy/minic/target/scala-2.13/classes/miniC/miniCAST$Skip$.class[0m
 [0m[[0m[0mdebug[0m] [0m[0m	miniC/miniCError$InterpError$.class[0m
 [0m[[0m[0mdebug[0m] [0m[0m	  /Users/jaehyun/Documents/KAIST/PLRG/Toy/minic/target/scala-2.13/classes/miniC/miniCError$InterpError$.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	miniC/miniCLabelAST$EOP$.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /Users/jaehyun/Documents/KAIST/PLRG/Toy/minic/target/scala-2.13/classes/miniC/miniCLabelAST$EOP$.class[0m
 [0m[[0m[0mdebug[0m] [0m[0m	miniC/miniCAST$Sub.class[0m
 [0m[[0m[0mdebug[0m] [0m[0m	  /Users/jaehyun/Documents/KAIST/PLRG/Toy/minic/target/scala-2.13/classes/miniC/miniCAST$Sub.class[0m
 [0m[[0m[0mdebug[0m] [0m[0m	miniC/miniCAST$In$.class[0m

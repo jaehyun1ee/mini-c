@@ -28,10 +28,10 @@ trait miniCAST {
     case class While(cond: BoolExpr, body: Cmd) extends Cmd // while(b){c}
 }
 
-// AST of miniC
+// Labelled AST of miniC
 trait miniCLabelAST extends miniCAST {
     // Mini C Program
-    case class ProgramL(cmd: CmdL)
+    case class ProgramL(cmdL: CmdL)
 
     // Commands
     trait CmdL // C ::=
@@ -41,4 +41,6 @@ trait miniCLabelAST extends miniCAST {
     case class InL(label: Int, name: String) extends CmdL // input(x)
     case class BranchL(label: Int, cond: BoolExpr, trueBranch: CmdL, falseBranch: CmdL) extends CmdL // if(be){c}else{c}
     case class WhileL(label: Int, cond: BoolExpr, body: CmdL) extends CmdL // while(b){c}
+    case class SOP(label: Int) extends CmdL
+    case class EOP(label: Int) extends CmdL
 }
