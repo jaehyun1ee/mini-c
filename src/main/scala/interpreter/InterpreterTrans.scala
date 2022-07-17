@@ -111,18 +111,26 @@ trait miniCTransInterpreter extends miniCLabelAST with miniCError {
         def transfer(state: State): State = state.map(x => {
             val (cmdL, env) = x
             step(cmdL, env)
-        })
+        }) diff state
         val cmdL = progL.cmdL match {
             case SeqL(_, cmdL, _) => cmdL
             case _ => ???
         }
-        var state = transfer(Set((cmdL, Map[String, Int]())))
+        var loop = transfer(Set((cmdL, Map[String, Int]())))
+        var state = Set[(CmdL, EnvT)]()
         var continue = true
+        while(continue) {
+            loop = transfer(loop)
+            if(loop.isEmpty) continue = false
+            else state = state union loop
+        }
+        /*
         while(continue) {
             val transferState = transfer(state)
             if(state == (state union transferState)) continue = false
             else state = state union transferState
         }
+        */
 
         println(pretty(progL.cmdL, "", nextMap) + "\n")
         state
