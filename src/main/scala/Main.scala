@@ -1,8 +1,7 @@
 package miniC
 
 object Main extends App with miniCDriver {
-    println(run("x := 3; y := x"))
-    /*
+    //println(run("x := 3; y := x"))
     println(run("""
         x := 5;
         y := 1;
@@ -15,5 +14,4 @@ object Main extends App with miniCDriver {
             x := x + y
         }
     """))
-    */
 }

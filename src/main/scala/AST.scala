@@ -26,6 +26,19 @@ trait miniCAST {
     case class In(name: String) extends Cmd // input(x)
     case class Branch(cond: BoolExpr, trueBranch: Cmd, falseBranch: Cmd) extends Cmd // if(be){c}else{c}
     case class While(cond: BoolExpr, body: Cmd) extends Cmd // while(b){c}
+
+    // Pretty printer
+    def pretty(scalarExpr: ScalarExpr): String = scalarExpr match {
+        case Num(n) => n.toString
+        case Add(left, right) => pretty(left) + " + " + pretty(right)
+        case Sub(left, right) => pretty(left) + " - " + pretty(right)
+        case Id(x) => x
+    }
+    def pretty(boolExpr: BoolExpr): String = boolExpr match {
+        case Bool(b) => b.toString
+        case Eq(left, right) => left + " == " + pretty(right)
+        case Lt(left, right) => left + " < " + pretty(right)
+    }
 }
 
 // Labelled AST of miniC
@@ -43,4 +56,19 @@ trait miniCLabelAST extends miniCAST {
     case class WhileL(label: Int, cond: BoolExpr, body: CmdL) extends CmdL // while(b){c}
     case class SOP(label: Int) extends CmdL
     case class EOP(label: Int) extends CmdL
+
+    // Pretty Printer
+    def pretty(cmdL: CmdL, indent: String): String = cmdL match {
+        case SkipL(label) => indent + s"Skip [$label]"
+        case SeqL(label, head, tail) => pretty(head, indent) + ";\n" + pretty(tail, indent)
+        case AssignL(label, name, expr) => indent + name + " := " + pretty(expr) + s" [$label]"
+        case InL(label, name) => indent + "input(" + name + ")" + s" [$label]"
+        case BranchL(label, cond, trueBranch, falseBranch) => indent + "if(" + pretty(cond) + ")" + s" [$label]\n" + indent + "{\n" + pretty(trueBranch, indent + "   ") + "\n" + indent + "}\n" + indent + "else {\n" + pretty(falseBranch, indent + "   ") + "\n" + indent + "}"
+        case WhileL(label, cond, body) => indent + "while(" + pretty(cond) + ")" + s" [$label]\n" + indent + "{\n" + pretty(body, indent + "   ") + "\n" + indent + "}"
+        case SOP(label) => s"SOP [$label]"
+        case EOP(label) => s"EOP [$label]"
+    }
+    def pretty(progL: ProgramL): String = {
+        pretty(progL.cmdL, "")
+    }
 }
