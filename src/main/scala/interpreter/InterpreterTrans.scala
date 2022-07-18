@@ -132,16 +132,7 @@ trait miniCTransInterpreter extends miniCLabelAST with miniCError {
 
     // Pretty printer
     def pretty(cmdL: CmdL, indent: String, nextMap: NextMap): String = {
-        def lookUpNext(cmdL: CmdL, opt: Option[Boolean]): Int = nextMap.getOrElse((cmdL, opt), interpError(s"no next ${cmdL.toString}")) match {
-            case SkipL(label) => label
-            case SeqL(label, _, _) => label
-            case AssignL(label, _, _) => label
-            case InL(label, _) => label
-            case BranchL(label, _, _, _) => label
-            case WhileL(label, _, _) => label
-            case SOP(label) => label
-            case EOP(label) => label
-        }
+        def lookUpNext(cmdL: CmdL, opt: Option[Boolean]): Int = getLabel(nextMap.getOrElse((cmdL, opt), interpError(s"no next ${cmdL.toString}")))
         cmdL match {
             case SkipL(label) => indent + s"Skip [$label]=>[${lookUpNext(cmdL, None)}]"
             case SeqL(label, head, tail) => pretty(head, indent, nextMap) + "\n" + pretty(tail, indent, nextMap)
@@ -157,16 +148,7 @@ trait miniCTransInterpreter extends miniCLabelAST with miniCError {
         pretty(progL.cmdL, "", nextMap)
     }
     def pretty(cmdL: CmdL, indent: String, nextMap: NextMap, stateMap: Map[Int, String]): String = {
-        def lookUpNext(cmdL: CmdL, opt: Option[Boolean]): Int = nextMap.getOrElse((cmdL, opt), interpError(s"no next ${cmdL.toString}")) match {
-            case SkipL(label) => label
-            case SeqL(label, _, _) => label
-            case AssignL(label, _, _) => label
-            case InL(label, _) => label
-            case BranchL(label, _, _, _) => label
-            case WhileL(label, _, _) => label
-            case SOP(label) => label
-            case EOP(label) => label
-        }
+        def lookUpNext(cmdL: CmdL, opt: Option[Boolean]): Int = getLabel(nextMap.getOrElse((cmdL, opt), interpError(s"no next ${cmdL.toString}")))
         def lookUpState(label: Int) = stateMap.getOrElse(label, "empty")
         cmdL match {
             case SkipL(label) => indent + s"Skip [$label]=>[${lookUpNext(cmdL, None)}]" + s"\t // ${lookUpState(label)}"
@@ -180,22 +162,9 @@ trait miniCTransInterpreter extends miniCLabelAST with miniCError {
         }
     }
     def pretty(progL: ProgramL, nextMap: NextMap, state: State): String = {
-        // Given a state, turn it into a map of label => (stringified) environment(s)
         val stateMap = state.map(x => {
             val (cmdL, envT) = x
-            cmdL match {
-                case SkipL(label) => (label, envT.toString)
-                case SeqL(_, _, _) => (-1, "")
-                case AssignL(label, _, _) => (label, envT.toString)
-                case InL(label, _) => (label, envT.toString)
-                case BranchL(label, _, _, _) => (label, envT.toString)
-                case WhileL(label, _, _) => (label, envT.toString)
-                case EOP(label) => (label, envT.toString)
-                case SOP(label) => (label, envT.toString)
-            }
-        }).filter(x => {
-            val (label, envT) = x
-            label >= 0
+            (getLabel(cmdL), envT.toString)
         }).groupBy(x => {
             val (label, envT) = x
             label

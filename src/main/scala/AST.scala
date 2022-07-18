@@ -36,8 +36,8 @@ trait miniCAST {
     }
     def pretty(boolExpr: BoolExpr): String = boolExpr match {
         case Bool(b) => b.toString
-        case Eq(left, right) => left + " == " + pretty(right)
-        case Lt(left, right) => left + " < " + pretty(right)
+        case Eq(left, right) => pretty(left) + " == " + pretty(right)
+        case Lt(left, right) => pretty(left) + " < " + pretty(right)
     }
 }
 
@@ -56,6 +56,17 @@ trait miniCLabelAST extends miniCAST {
     case class WhileL(label: Int, cond: BoolExpr, body: CmdL) extends CmdL // while(b){c}
     case class SOP(label: Int) extends CmdL
     case class EOP(label: Int) extends CmdL
+
+    def getLabel(cmdL: CmdL): Int = cmdL match {
+        case SkipL(label) => label
+        case SeqL(label, _, _) => label
+        case AssignL(label, _, _) => label
+        case InL(label, _) => label
+        case BranchL(label, _, _, _) => label
+        case WhileL(label, _, _) => label
+        case SOP(label) => label
+        case EOP(label) => label
+    }
 
     // Pretty Printer
     def pretty(cmdL: CmdL, indent: String): String = cmdL match {
