@@ -83,6 +83,7 @@ trait miniCTransInterpreter extends miniCLabelAST with miniCError {
         // a. Turn the program into a labelled program, and get the next mappings
         val progL = labelProg(prog)
         val nextMap = nextProg(progL)
+        println(pretty(progL, nextMap) + "\n")
 
         // b, Define state transition
         // i.e., defining the  step function
@@ -91,8 +92,8 @@ trait miniCTransInterpreter extends miniCLabelAST with miniCError {
             case SkipL(_) => (lookUpNext(cmdL, None), env)
             case SeqL(_, _, _) => (lookUpNext(cmdL, None), env)
             case AssignL(_, name, expr) => (lookUpNext(cmdL, None), env + (name -> interpTrans(expr, env)))
-            case InL(_, name) => {
-                print(s"Enter input for $name: ")
+            case InL(label, name) => {
+                print(s"[$label] Enter input for $name: ")
                 (lookUpNext(cmdL, None), env + (name -> readLine().toInt))
             }
             case BranchL(_, cond, _, _) => {
@@ -124,15 +125,8 @@ trait miniCTransInterpreter extends miniCLabelAST with miniCError {
             if(loop.isEmpty) continue = false
             else state = state union loop
         }
-        /*
-        while(continue) {
-            val transferState = transfer(state)
-            if(state == (state union transferState)) continue = false
-            else state = state union transferState
-        }
-        */
 
-        println(pretty(progL.cmdL, "", nextMap) + "\n")
+        println(pretty(progL, nextMap, state) + "\n")
         state
     }
 
@@ -150,7 +144,7 @@ trait miniCTransInterpreter extends miniCLabelAST with miniCError {
         }
         cmdL match {
             case SkipL(label) => indent + s"Skip [$label]=>[${lookUpNext(cmdL, None)}]"
-            case SeqL(label, head, tail) => pretty(head, indent, nextMap) + ";\n" + pretty(tail, indent, nextMap)
+            case SeqL(label, head, tail) => pretty(head, indent, nextMap) + "\n" + pretty(tail, indent, nextMap)
             case AssignL(label, name, expr) => indent + name + " := " + pretty(expr) + s" [$label]=>[${lookUpNext(cmdL, None)}]"
             case InL(label, name) => indent + "input(" + name + ")" + s" [$label]=>[${lookUpNext(cmdL, None)}]"
             case BranchL(label, cond, trueBranch, falseBranch) => indent + "if(" + pretty(cond) + ")" + s" [$label]=>t[${lookUpNext(cmdL, Some(true))}] f[${lookUpNext(cmdL, Some(false))}]\n" + indent + "{\n" + pretty(trueBranch, indent + "   ", nextMap) + "\n" + indent + "}\n" + indent + "else {\n" + pretty(falseBranch, indent + "   ", nextMap) + "\n" + indent + "}"
@@ -159,23 +153,61 @@ trait miniCTransInterpreter extends miniCLabelAST with miniCError {
             case EOP(label) => s"EOP [$label]"
         }
     }
-
-    def pretty(state: State): String = {
-        var res: String = ""
-        state.foreach(x => {
+    def pretty(progL: ProgramL, nextMap: NextMap): String = {
+        pretty(progL.cmdL, "", nextMap)
+    }
+    def pretty(cmdL: CmdL, indent: String, nextMap: NextMap, stateMap: Map[Int, String]): String = {
+        def lookUpNext(cmdL: CmdL, opt: Option[Boolean]): Int = nextMap.getOrElse((cmdL, opt), interpError(s"no next ${cmdL.toString}")) match {
+            case SkipL(label) => label
+            case SeqL(label, _, _) => label
+            case AssignL(label, _, _) => label
+            case InL(label, _) => label
+            case BranchL(label, _, _, _) => label
+            case WhileL(label, _, _) => label
+            case SOP(label) => label
+            case EOP(label) => label
+        }
+        def lookUpState(label: Int) = stateMap.getOrElse(label, "empty")
+        cmdL match {
+            case SkipL(label) => indent + s"Skip [$label]=>[${lookUpNext(cmdL, None)}]" + s"\t // ${lookUpState(label)}"
+            case SeqL(label, head, tail) => pretty(head, indent, nextMap, stateMap) + "\n" + pretty(tail, indent, nextMap, stateMap)
+            case AssignL(label, name, expr) => indent + name + " := " + pretty(expr) + s" [$label]=>[${lookUpNext(cmdL, None)}]" + s"\t // ${lookUpState(label)}"
+            case InL(label, name) => indent + "input(" + name + ")" + s" [$label]=>[${lookUpNext(cmdL, None)}]" + s"\t // ${lookUpState(label)}"
+            case BranchL(label, cond, trueBranch, falseBranch) => indent + "if(" + pretty(cond) + ")" + s" [$label]=>t[${lookUpNext(cmdL, Some(true))}] f[${lookUpNext(cmdL, Some(false))}]" + s"\t // ${lookUpState(label)}\n" + indent + "{\n" + pretty(trueBranch, indent + "   ", nextMap, stateMap) + "\n" + indent + "}\n" + indent + "else {\n" + pretty(falseBranch, indent + "   ", nextMap, stateMap) + "\n" + indent + "}"
+            case WhileL(label, cond, body) => indent + "while(" + pretty(cond) + ")" + s" [$label]=>t[${lookUpNext(cmdL, Some(true))}] f[${lookUpNext(cmdL, Some(false))}]" + s"\t // ${lookUpState(label)}\n" + indent + "{\n" + pretty(body, indent + "   ", nextMap, stateMap) + "\n" + indent + "}"
+            case SOP(label) => s"SOP [$label]=>[${lookUpNext(cmdL, None)}]" + s"\t // ${lookUpState(label)}"
+            case EOP(label) => s"EOP [$label]" + s"\t // ${lookUpState(label)}"
+        }
+    }
+    def pretty(progL: ProgramL, nextMap: NextMap, state: State): String = {
+        // Given a state, turn it into a map of label => (stringified) environment(s)
+        val stateMap = state.map(x => {
             val (cmdL, envT) = x
-            res = res + (cmdL match {
-                case SkipL(label) => s"${label} => ${envT.toString}\n"
-                case SeqL(_, _, _) => ""
-                case AssignL(label, _, _) => s"${label} => ${envT.toString}\n"
-                case InL(label, _) => s"${label} => ${envT.toString}\n"
-                case BranchL(label, _, _, _) => s"${label} => ${envT.toString}\n"
-                case WhileL(label, _, _) => s"${label} => ${envT.toString}\n"
-                case EOP(label) => s"${label} => ${envT.toString}\n"
-                case SOP(label) => s"${label} => ${envT.toString}\n"
+            cmdL match {
+                case SkipL(label) => (label, envT.toString)
+                case SeqL(_, _, _) => (-1, "")
+                case AssignL(label, _, _) => (label, envT.toString)
+                case InL(label, _) => (label, envT.toString)
+                case BranchL(label, _, _, _) => (label, envT.toString)
+                case WhileL(label, _, _) => (label, envT.toString)
+                case EOP(label) => (label, envT.toString)
+                case SOP(label) => (label, envT.toString)
+            }
+        }).filter(x => {
+            val (label, envT) = x
+            label >= 0
+        }).groupBy(x => {
+            val (label, envT) = x
+            label
+        }).map{case (label, envS) => {
+            var res = ""
+            envS.foreach(x => {
+                val (label, envT) = x
+                res = res + envT + ", "
             })
-        })
-        
-        res
+            (label, res)
+        }}
+
+        pretty(progL.cmdL, "", nextMap, stateMap)
     }
 }

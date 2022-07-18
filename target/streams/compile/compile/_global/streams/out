@@ -1,4 +1,4 @@
-[0m[[0m[31merror[0m] [0m[0m/Users/jaehyun/Documents/KAIST/PLRG/Toy/minic/src/main/scala/interpreter/InterpreterTrans.scala:166:18: No implicit Ordering defined for miniCTransInterpreter.this.State.[0m
-[0m[[0m[31merror[0m] [0m[0m        SortedSet(state).foreach(x => {[0m
-[0m[[0m[31merror[0m] [0m[0m                 ^[0m
+[0m[[0m[31merror[0m] [0m[0m/Users/jaehyun/Documents/KAIST/PLRG/Toy/minic/src/main/scala/interpreter/InterpreterTrans.scala:170:68: ';' expected but ')' found.[0m
+[0m[[0m[31merror[0m] [0m[0m        def lookUpState(label: Int) = stateMap.getOrElse(label, ""))[0m
+[0m[[0m[31merror[0m] [0m[0m                                                                   ^[0m
 [0m[[0m[31merror[0m] [0m[0mone error found[0m
