@@ -4,9 +4,9 @@ trait miniCDriver extends miniCParser with miniCCompInterpreter with miniCTransI
     def run(code: String): String = {
         val p: Program = ProgramParser(code)
 
-        println("Transitional Style\n")
+        println("1. Transitional Style")
         interpTrans(p)
-        println("Compositional Style\n")
+        println("2. Compositional Style")
         interpComp(p).toString
     }
 }

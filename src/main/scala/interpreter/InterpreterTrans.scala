@@ -54,14 +54,14 @@ trait miniCTransInterpreter extends miniCLabelAST with miniCError {
                 nextMapBody
             }
             case SOP(_) => nextMap + ((cmdL, None) -> next)
-            case EOP(_) => ???
+            case EOP(_) => nextMap
         }
 
-        val (cmdL, eop) = progL.cmdL match {
-            case SeqL(_, cmdL, eop) => (cmdL, eop)
+        val eop = progL.cmdL match {
+            case SeqL(_, _, eop) => eop
             case _ => ???
         }
-        nextCmdL(cmdL, Map[(CmdL, Option[Boolean]), CmdL](), eop)
+        nextCmdL(progL.cmdL, Map[(CmdL, Option[Boolean]), CmdL](), eop)
     }
 
     // 3. Interpret the code by applying the step function until fixpoint is reached
@@ -83,6 +83,7 @@ trait miniCTransInterpreter extends miniCLabelAST with miniCError {
         // a. Turn the program into a labelled program, and get the next mappings
         val progL = labelProg(prog)
         val nextMap = nextProg(progL)
+        println("a. Labelled AST")
         println(pretty(progL, nextMap) + "\n")
 
         // b, Define state transition
@@ -113,21 +114,18 @@ trait miniCTransInterpreter extends miniCLabelAST with miniCError {
             val (cmdL, env) = x
             step(cmdL, env)
         }) diff state
-        val cmdL = progL.cmdL match {
-            case SeqL(_, cmdL, _) => cmdL
-            case _ => ???
-        }
-        var loop = transfer(Set((cmdL, Map[String, Int]())))
-        var state = Set[(CmdL, EnvT)]()
-        var continue = true
-        while(continue) {
-            loop = transfer(loop)
-            if(loop.isEmpty) continue = false
-            else state = state union loop
+        def collect(prev: State, acc: State): State = {
+            val cur = transfer(prev)
+            if (cur.isEmpty) acc
+            else collect(cur, acc union cur)
         }
 
-        println(pretty(progL, nextMap, state) + "\n")
-        state
+        val initState = transfer(Set((progL.cmdL, Map[String, Int]())))
+        val finalState = collect(initState, initState)
+
+        println("b. Result of Transitional Interpreter")
+        println(pretty(progL, nextMap, finalState) + "\n")
+        finalState
     }
 
     // Pretty printer
@@ -149,7 +147,7 @@ trait miniCTransInterpreter extends miniCLabelAST with miniCError {
     }
     def pretty(cmdL: CmdL, indent: String, nextMap: NextMap, stateMap: Map[Int, String]): String = {
         def lookUpNext(cmdL: CmdL, opt: Option[Boolean]): Int = getLabel(nextMap.getOrElse((cmdL, opt), interpError(s"no next ${cmdL.toString}")))
-        def lookUpState(label: Int) = stateMap.getOrElse(label, "empty")
+        def lookUpState(label: Int) = stateMap.getOrElse(label, "Unreached")
         cmdL match {
             case SkipL(label) => indent + s"Skip [$label]=>[${lookUpNext(cmdL, None)}]" + s"\t // ${lookUpState(label)}"
             case SeqL(label, head, tail) => pretty(head, indent, nextMap, stateMap) + "\n" + pretty(tail, indent, nextMap, stateMap)

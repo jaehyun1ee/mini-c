@@ -10,7 +10,7 @@ trait miniCParser extends miniCAST with miniCError with RegexParsers with Packra
     object CmdParser extends ParserObject(cmd)
     
     abstract class ParserObject[T](parser: PackratParser[T]) {
-        def apply(code: String): T = parseAll(parser, code).getOrElse(parseError(s"bad syntax: $code"))
+        def apply(code: String): T = parseAll(parser, code).getOrElse(parseError(s"parsing error: $code"))
     }
     def wrapCurly[T](rule: PackratParser[T]): PackratParser[T] = "{" ~> rule <~ "}"
     def wrapParen[T](rule: PackratParser[T]): PackratParser[T] = "(" ~> rule <~ ")"
