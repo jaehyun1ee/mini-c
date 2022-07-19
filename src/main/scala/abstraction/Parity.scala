@@ -58,6 +58,10 @@ trait Parity {
         case (Odd(), Odd()) => true
         case _ => false
     }
+
+    def abstraction(n: Int) = if(n % 2 == 0) Even() else Odd()
+    def bottom:Parity = Bottom()
+    def top:Parity = Top()
 }
 
 /*

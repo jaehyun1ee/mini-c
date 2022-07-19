@@ -16,7 +16,7 @@ trait miniCAnalyzer extends miniCControlFlow with miniCError with Parity {
     */
 
     def analyze(scalarExpr: ScalarExpr, env: AbsEnv): Parity = scalarExpr match {
-        case Num(n) => if(n % 2 == 0) Even() else Odd()
+        case Num(n) => abstraction(n)
         case Add(left, right) => analyze(left, env) + analyze(right, env)
         case Sub(left, right) => analyze(left, env) - analyze(right, env)
         case Id(x) => env.getOrElse(x, analyzeError(s"free identifier: $x"))
@@ -32,7 +32,7 @@ trait miniCAnalyzer extends miniCControlFlow with miniCError with Parity {
             case SkipL(_) => Set((lookUpNext(None), env))
             case SeqL(_, _, _) => Set((lookUpNext(None), env))
             case AssignL(_, name, expr) => Set((lookUpNext(None), env + (name -> analyze(expr, env))))
-            case InL(label, name) => Set((lookUpNext(None), env + (name -> Top())))
+            case InL(label, name) => Set((lookUpNext(None), env + (name -> top)))
             case BranchL(_, cond, _, _) => analyze(cond, env) match {
                 case Some(true) => Set((lookUpNext(Some(true)), env))
                 case Some(false) => Set((lookUpNext(Some(false)), env))
@@ -73,8 +73,7 @@ trait miniCAnalyzer extends miniCControlFlow with miniCError with Parity {
 
             // From Map[String, Set[(String, Parity)]] To Map[String, Parity]
             val acc = transpose.map{case (id, envS) => {
-                var base: Parity = Bottom()
-                val fold = envS.map(x => x._2).foldLeft(Set[Parity]()) ((x, y) => x + y).foldLeft(base) ((x, y) => x union y)
+                val fold = envS.map(x => x._2).foldLeft(Set[Parity]()) ((x, y) => x + y).foldLeft(bottom) ((x, y) => x union y)
                 id -> fold
             }}
             
