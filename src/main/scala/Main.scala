@@ -14,6 +14,7 @@ object Main extends App with miniCDriver {
             x := x + y
         }
     """)
+    /*
     run("""
         x := 5;
         y := 1;
@@ -25,4 +26,5 @@ object Main extends App with miniCDriver {
             }
         }
     """)
+    */
 }

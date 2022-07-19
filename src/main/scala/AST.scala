@@ -44,7 +44,7 @@ trait miniCAST {
 // Labelled AST of miniC
 trait miniCLabelAST extends miniCAST {
     // Mini C Program
-    case class ProgramL(cmdL: CmdL)
+    case class ProgramL(cmd: CmdL)
 
     // Commands
     trait CmdL // C ::=
@@ -79,7 +79,7 @@ trait miniCLabelAST extends miniCAST {
         case SOP(label) => s"SOP [$label]"
         case EOP(label) => s"EOP [$label]"
     }
-    def pretty(progL: ProgramL): String = {
-        pretty(progL.cmdL, "")
+    def pretty(prog: ProgramL): String = {
+        pretty(prog.cmd, "")
     }
 }

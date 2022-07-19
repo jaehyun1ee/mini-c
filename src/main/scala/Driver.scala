@@ -7,9 +7,9 @@ trait miniCDriver extends miniCParser with miniCCompInterpreter with miniCTransI
         println("\n0. Code")
         println(code)
         println("\n1. Transitional Style")
-        //interpTrans(p)
+        interpTrans(p)
         println("\n2. Compositional Style")
-        //println(interpComp(p))
+        println(interpComp(p))
         println("\n3. (Flow-sensitive) Analysis")
         analyze(p)
     }
