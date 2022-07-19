@@ -1,39 +1,39 @@
 package miniC
 
 // Parity Abstraction
-trait Interval {
+trait IntervalDomain {
     /*
         Operator Definition
     */
 
     // + operator
-    def +(that: Interval): Interval = (this, that) match {
-        case (Bottom(), Bottom()) => Bottom() // Bottom + Bottom case
-        case (Interval(a, b), Bottom()) => Interval(a, b) // Bottom + _ cases
-        case (Bottom(), Interval(a, b)) => Interval(a, b)
+    def +(that: IntervalDomain): IntervalDomain = (this, that) match {
+        case (IntBottom(), IntBottom()) => IntBottom() // IntBottom + IntBottom case
+        case (Interval(a, b), IntBottom()) => Interval(a, b) // IntBottom + _ cases
+        case (IntBottom(), Interval(a, b)) => Interval(a, b)
 
-        case (Top(), Top()) => Top() // Top + _ cases
-        case (Top(), _) => Top()
-        case (_, Top()) => Top()
+        case (IntTop(), IntTop()) => IntTop() // IntTop + _ cases
+        case (IntTop(), _) => IntTop()
+        case (_, IntTop()) => IntTop()
 
         case (Interval(a, b), Interval(c, d)) => Interval(a+c, b+d) // Interval + Interval case
     }
 
     // - operator
-    def -(that: Parity): Parity = (this, that) match {
-        case (Bottom(), Bottom()) => Bottom() // Bottom - Bottom case
-        case (Interval(a, b), Bottom()) => Interval(a, b) // Bottom - _ cases
-        case (Bottom(), Interval(a, b)) => Interval(-b, -a)
+    def -(that: IntervalDomain): IntervalDomain = (this, that) match {
+        case (IntBottom(), IntBottom()) => IntBottom() // IntBottom - IntBottom case
+        case (Interval(a, b), IntBottom()) => Interval(a, b) // IntBottom - _ cases
+        case (IntBottom(), Interval(a, b)) => Interval(-b, -a)
 
-        case (Top(), Top()) => Top() // Top - _ cases
-        case (Top(), _) => Top()
-        case (_, Top()) => Top()
+        case (IntTop(), IntTop()) => IntTop() // IntTop - _ cases
+        case (IntTop(), _) => IntTop()
+        case (_, IntTop()) => IntTop()
 
         case (Interval(a, b), Interval(c, d)) => Interval(a-d, b-c) // Interval - Interval case
     }
 
     // == operator
-    def same(that: Parity): Option[Boolean] = (this, that) match {
+    def same(that: IntervalDomain): Option[Boolean] = (this, that) match {
         case (Interval(a, b), Interval(c, d)) => {
             if(a==c && b==d) Some(true)
             else Some(false)
@@ -42,13 +42,13 @@ trait Interval {
     }
 
     // union operator (find an enclosing parity for THIS and THAT)
-    def union(that: Parity): Parity = (this, that) match {
-        case (Bottom(), Bottom()) => Bottom()
-        case (Bottom(), Interval(a, b)) => Interval(a, b)
-        case (Interval(a, b), Bottom()) => Interval(a, b)
+    def union(that: IntervalDomain): IntervalDomain = (this, that) match {
+        case (IntBottom(), IntBottom()) => IntBottom()
+        case (IntBottom(), Interval(a, b)) => Interval(a, b)
+        case (Interval(a, b), IntBottom()) => Interval(a, b)
 
-        case (Top(), _) => Top()
-        case (_, Top()) => Top()
+        case (IntTop(), _) => IntTop()
+        case (_, IntTop()) => IntTop()
 
         case (Interval(a, b), Interval(c, d)) => {
             if(a < c){
@@ -68,13 +68,13 @@ trait Interval {
     }
 
     // contain operator (return true if THIS contains THAT)
-    def contain(that: Parity): Boolean = (this, that) match {
-        case (Top(), Top()) => true
-        case (_, Top()) => false
-        case (Top(), _) => true
-        case (Bottom(), Bottom()) => true
-        case (_, Bottom()) => true
-        case (Bottom(), _) => false
+    def contain(that: IntervalDomain): Boolean = (this, that) match {
+        case (IntTop(), IntTop()) => true
+        case (_, IntTop()) => false
+        case (IntTop(), _) => true
+        case (IntBottom(), IntBottom()) => true
+        case (_, IntBottom()) => true
+        case (IntBottom(), _) => false
         case (Interval(a, b), Interval(c, d)) => {
             if(a <= c && b >= d) true
             else false 
@@ -87,6 +87,6 @@ trait Interval {
     Alternative Definition
 */
 
-case class Bottom() extends Interval
-case class Interval(lowerbound : Int, upperbound : Int) extends Interval
-case class Top() extends Interval
+case class IntBottom() extends IntervalDomain
+case class Interval(lowerbound : Int, upperbound : Int) extends IntervalDomain
+case class IntTop() extends IntervalDomain
