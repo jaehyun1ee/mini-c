@@ -87,26 +87,26 @@ trait miniCTransInterpreter extends miniCLabelAST with miniCError {
         println(pretty(progL, nextMap) + "\n")
 
         // b, Define state transition
-        // i.e., defining the  step function
+        // i.e., defining the step function
         def lookUpNext(cmdL: CmdL, opt: Option[Boolean]): CmdL = nextMap.getOrElse((cmdL, opt), interpError(s"no next ${cmdL.toString}"))
-        def step(cmdL: CmdL, env: EnvT): (CmdL, EnvT) = cmdL match {
-            case SkipL(_) => (lookUpNext(cmdL, None), env)
-            case SeqL(_, _, _) => (lookUpNext(cmdL, None), env)
-            case AssignL(_, name, expr) => (lookUpNext(cmdL, None), env + (name -> interpTrans(expr, env)))
+        def step(cmdL: CmdL, envT: EnvT): (CmdL, EnvT) = cmdL match {
+            case SkipL(_) => (lookUpNext(cmdL, None), envT)
+            case SeqL(_, _, _) => (lookUpNext(cmdL, None), envT)
+            case AssignL(_, name, expr) => (lookUpNext(cmdL, None), envT + (name -> interpTrans(expr, envT)))
             case InL(label, name) => {
                 print(s"[$label] Enter input for $name: ")
-                (lookUpNext(cmdL, None), env + (name -> readLine().toInt))
+                (lookUpNext(cmdL, None), envT + (name -> readLine().toInt))
             }
             case BranchL(_, cond, _, _) => {
-                if(interpTrans(cond, env)) (lookUpNext(cmdL, Some(true)), env)
-                else (lookUpNext(cmdL, Some(false)), env)
+                if(interpTrans(cond, envT)) (lookUpNext(cmdL, Some(true)), envT)
+                else (lookUpNext(cmdL, Some(false)), envT)
             }
             case WhileL(_, cond, _) => {
-                if(interpTrans(cond, env)) (lookUpNext(cmdL, Some(true)), env)
-                else (lookUpNext(cmdL, Some(false)), env)
+                if(interpTrans(cond, envT)) (lookUpNext(cmdL, Some(true)), envT)
+                else (lookUpNext(cmdL, Some(false)), envT)
             }
-            case SOP(_) => (lookUpNext(cmdL, None), env)
-            case EOP(_) => (cmdL, env)
+            case SOP(_) => (lookUpNext(cmdL, None), envT)
+            case EOP(_) => (cmdL, envT)
         }
 
         // c. Applying step transition for each state
