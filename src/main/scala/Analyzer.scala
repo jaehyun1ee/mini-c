@@ -1,21 +1,21 @@
 package miniC
 
 // Flow-sensitive Static Analysis
-trait miniCAnalyzerParity extends miniCControlFlow with miniCError with Parity {
+abstract class miniCAnalyzer extends miniCControlFlow with miniCError with Abstraction {
     /*
         Abstract environment and Abstract State
             - abstract environment: id(string) => abstract value
             - abstract state: command => abstract environment (at that command)
     */
 
-    type AbsEnv = Map[String, Parity]
+    type AbsEnv = Map[String, Abstraction]
     type AbsState = Map[CmdL, AbsEnv]
 
     /*
         Flow-sensitive Static Analysis
     */
 
-    def analyze(scalarExpr: ScalarExpr, env: AbsEnv): Parity = scalarExpr match {
+    def analyze(scalarExpr: ScalarExpr, env: AbsEnv): Abstraction = scalarExpr match {
         case Num(n) => abstraction(n)
         case Add(left, right) => analyze(left, env) + analyze(right, env)
         case Sub(left, right) => analyze(left, env) - analyze(right, env)
@@ -24,6 +24,7 @@ trait miniCAnalyzerParity extends miniCControlFlow with miniCError with Parity {
     def analyze(boolExpr: BoolExpr, env: AbsEnv): Option[Boolean] = boolExpr match {
         case Bool(b) => Some(b)
         case Eq(left, right) => analyze(left, env) same analyze(right, env)
+        case Lt(left, right) => analyze(left, env) lt analyze(right, env)
         case _ => None
     }
     def analyze(cmd: CmdL, env: AbsEnv, nextMap: NextMap): Set[(CmdL, AbsEnv)] = {
@@ -54,30 +55,30 @@ trait miniCAnalyzerParity extends miniCControlFlow with miniCError with Parity {
             Helper Functions
         */
 
-        // From Map[CmdL, Map[String, Parity]] To Set[(CmdL, Map[String, Parity])]
+        // From Map[CmdL, Map[String, Abstraction]] To Set[(CmdL, Map[String, Abstraction])]
         def pointwise(state: AbsState): Set[(CmdL, AbsEnv)] = state.toSet.map((x: (CmdL, AbsEnv)) => {
             val (cmd, env) = x
             analyze(cmd, env, nextMap)
         }).foldLeft(Set[(CmdL, AbsEnv)]()) ((x, y) => x union y)
 
-        // From Set[(CmdL, Map[String, Parity])] To Map[CmdL, Set[Map[String, Parity]]]
+        // From Set[(CmdL, Map[String, Abstraction])] To Map[CmdL, Set[Map[String, Abstraction]]]
         def partition(pointwiseState: Set[(CmdL, AbsEnv)]): Map[CmdL, Set[AbsEnv]] = pointwiseState.groupBy((x: (CmdL, AbsEnv)) => x._1).map{case (cmdL, stepRes) => cmdL -> stepRes.map(x => x._2)}
         
-        // From Map[CmdL, Set[Map[String, Parity]]] To Map[CmdL, Map[String, Parity]]
+        // From Map[CmdL, Set[Map[String, Abstraction]]] To Map[CmdL, Map[String, Abstraction]]
         def union(partitionState: Map[CmdL, Set[AbsEnv]]): AbsState = partitionState.map{case (cmdL, envS) => {
-            // From Set[Map[String, Parity]] To Set[(String, Parity)]
-            val flat = envS.map(x => x.toSet).foldLeft(Set[(String, Parity)]()) ((x, y) => x union y)
+            // From Set[Map[String, Abstraction]] To Set[(String, Abstraction)]
+            val flat = envS.map(x => x.toSet).foldLeft(Set[(String, Abstraction)]()) ((x, y) => x union y)
 
-            // From Set[(String, Parity)] To Map[String, Set[(String, Parity)]]
+            // From Set[(String, Abstraction)] To Map[String, Set[(String, Abstraction)]]
             val transpose = flat.groupBy(x => x._1)
 
-            // From Map[String, Set[(String, Parity)]] To Map[String, Parity]
+            // From Map[String, Set[(String, Abstraction)]] To Map[String, Abstraction]
             val acc = transpose.map{case (id, envS) => {
-                val fold = envS.map(x => x._2).foldLeft(Set[Parity]()) ((x, y) => x + y).foldLeft(bottom) ((x, y) => x union y)
+                val fold = envS.map(x => x._2).foldLeft(Set[Abstraction]()) ((x, y) => x + y).foldLeft(bottom) ((x, y) => x union y)
                 id -> fold
             }}
             
-            // To Map[CmdL, Map[String, Parity]]
+            // To Map[CmdL, Map[String, Abstraction]]
             cmdL -> acc
         }}
 
@@ -123,19 +124,20 @@ trait miniCAnalyzerParity extends miniCControlFlow with miniCError with Parity {
                 val pointwiseState = diff.toSet union acc.toSet
                 val partitionState = partition(pointwiseState)
                 val unionState = union(partitionState)
+
                 collect(diff, unionState)
             }
         }
 
         // Run the framework
-        val initState = transfer(Map(prog.cmd -> Map[String, Parity]()))
+        val initState = transfer(Map(prog.cmd -> Map[String, Abstraction]()))
         val finalState = collect(initState, initState)
         println("b. Analysis Result")
         println(pretty(prog, nextMap, finalState))
 
         finalState
     }
-    def analyze_parity(prog: Program): AbsState = {
+    def analyze(prog: Program): AbsState = {
          // Turn the program into a labelled program, and get the next mappings
         val labelProg = label(prog)
         val nextMap = next(labelProg)
@@ -152,6 +154,28 @@ trait miniCAnalyzerParity extends miniCControlFlow with miniCError with Parity {
 
     def pretty(prog: ProgramL, nextMap: NextMap, state: AbsState): String = {
         val stateMap = state.map{case (cmd, env) => getLabel(cmd) -> env.toString}
-        pretty(prog.cmd, "", nextMap, stateMap)
+        pretty(prog.cmd, "", nextMap, stateMap, "Unreached")
     }
+}
+
+/*
+    Analyzer Companions on Different Abstractions
+*/
+
+class miniCAnalyzerParity extends miniCAnalyzer with Parity
+object miniCAnalyzerParity {
+    val analyzer = new miniCAnalyzerParity()
+    def analyze(program: Program): String = analyzer.analyze(program).toString
+}
+
+class miniCAnalyzerInterval extends miniCAnalyzer with IntervalDomain
+object miniCAnalyzerInterval {
+    val analyzer = new miniCAnalyzerInterval()
+    def analyze(program: Program): String = analyzer.analyze(program).toString
+}
+
+class miniCAnalyzerSign extends miniCAnalyzer with Sign
+object miniCAnalyzerSign {
+    val analyzer = new miniCAnalyzerSign()
+    def analyze(program: Program): String = analyzer.analyze(program).toString
 }

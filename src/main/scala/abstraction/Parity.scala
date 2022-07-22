@@ -1,7 +1,7 @@
 package miniC
 
 // Parity Abstraction
-trait Parity {
+trait Parity extends Abstraction {
     /*
         Operator Definition
     */
@@ -31,6 +31,9 @@ trait Parity {
         case _ => None
     }
 
+    // < operator
+    def lt(that: Parity): Option[Boolean] = None
+
     // union operator (find an enclosing parity for THIS and THAT)
     def union(that: Parity): Parity = (this, that) match {
         case (Bottom(), Bottom()) => Bottom()
@@ -59,9 +62,9 @@ trait Parity {
         case _ => false
     }
 
-    def abstraction(n: Int) = if(n % 2 == 0) Even() else Odd()
-    def bottom:Parity = Bottom()
-    def top:Parity = Top()
+    override def abstraction(n: Int):Parity = if(n % 2 == 0) Even() else Odd()
+    override def bottom:Parity = Bottom()
+    override def top:Parity = Top()
 }
 
 /*

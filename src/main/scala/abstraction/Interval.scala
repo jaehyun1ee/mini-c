@@ -1,7 +1,7 @@
 package miniC
 
 // Parity Abstraction
-trait IntervalDomain {
+trait IntervalDomain extends Abstraction {
     /*
         Operator Definition
     */
@@ -35,13 +35,25 @@ trait IntervalDomain {
     // == operator
     def same(that: IntervalDomain): Option[Boolean] = (this, that) match {
         case (Interval(a, b), Interval(c, d)) => {
-            if(a==c && b==d) Some(true)
-            else Some(false)
+            if(a==b && b==c && c==d) Some(true)
+            else if (b < c) Some(false)
+            else if (a > d) Some(false)
+            else None
         }
         case _ => None
     }
 
-    // union operator (find an enclosing parity for THIS and THAT)
+    // < operator
+    def lt(that: IntervalDomain): Option[Boolean] = (this, that) match {
+        case (Interval(a, b), Interval(c, d)) => {
+            if(b < c) Some(true)
+            else if(d <= a) Some(false)
+            else None
+        }
+        case _ => None
+    }
+
+    // union operator (find an enclosing interval for THIS and THAT)
     def union(that: IntervalDomain): IntervalDomain = (this, that) match {
         case (IntBottom(), IntBottom()) => IntBottom()
         case (IntBottom(), Interval(a, b)) => Interval(a, b)
@@ -81,6 +93,10 @@ trait IntervalDomain {
         }
         case _ => false
     }
+
+    override def abstraction(n: Int):IntervalDomain = Interval(n, n)
+    override def bottom:IntervalDomain = IntBottom()
+    override def top:IntervalDomain = IntTop()
 }
 
 /*

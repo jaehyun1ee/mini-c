@@ -2,8 +2,8 @@ package miniC
 
 import scala.io.StdIn.readLine
 
-// Compositional Interpreter of miniC
-trait miniCTransInterpreter extends miniCControlFlow with miniCError {
+// Transitional Interpreter of miniC
+class miniCTransInterpreter extends miniCControlFlow with miniCError {
     /*
         Define Environment and State
             - environment: id(string) => value(int)
@@ -17,7 +17,7 @@ trait miniCTransInterpreter extends miniCControlFlow with miniCError {
         Transitional-style Interpreter
     */
 
-    // 3. Interpret the code by applying the step function until fixpoint is reached
+    // Interpret the code by applying the step function until fixpoint is reached
     // i.e., get the collecting semantics and defining the step function
     def interpTrans(scalarExpr: ScalarExpr, env: TransEnv): Int = scalarExpr match {
         case Num(n) => n
@@ -64,7 +64,7 @@ trait miniCTransInterpreter extends miniCControlFlow with miniCError {
             else collect(cur, acc union cur)
         }
 
-        // Run the interpreter
+        // Run the interpreter (until fixpoint)
         val initState = transfer(Set((prog.cmd, Map[String, Int]())))
         val finalState = collect(initState, initState)
         println("b. Result of Transitional Interpreter")
@@ -103,6 +103,11 @@ trait miniCTransInterpreter extends miniCControlFlow with miniCError {
             (label, res)
         }}
 
-        pretty(prog.cmd, "", nextMap, stateMap)
+        pretty(prog.cmd, "", nextMap, stateMap, "Unreached")
     }
+}
+
+object miniCTransInterpreter {
+    val interpreter = new miniCTransInterpreter()
+    def interp(program: Program): String = interpreter.interpTrans(program).toString
 }
