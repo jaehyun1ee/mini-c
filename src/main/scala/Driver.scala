@@ -1,6 +1,6 @@
 package miniC
 
-trait miniCDriver extends miniCParser with miniCCompInterpreter with miniCTransInterpreter with miniCAnalyzerInterval{
+trait miniCDriver extends miniCParser with miniCCompInterpreter with miniCTransInterpreter with miniCAnalyzerInterval {
     def run(code: String): Unit = {
         val p: Program = ProgramParser(code)
 

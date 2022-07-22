@@ -1,7 +1,7 @@
 package miniC
 
 // Flow-sensitive Static Analysis
-trait miniCAnalyzer extends miniCControlFlow with miniCError with Parity {
+trait miniCAnalyzerParity extends miniCControlFlow with miniCError with Parity {
     /*
         Abstract environment and Abstract State
             - abstract environment: id(string) => abstract value
@@ -81,24 +81,28 @@ trait miniCAnalyzer extends miniCControlFlow with miniCError with Parity {
             cmdL -> acc
         }}
 
-        // Check if LEFT is different from RIGHT (i.e., LEFT is NOT contained in RIGHT)
-        def diff(left: AbsState, right: AbsState): Boolean = {
+        // Filter only the difference of LEFT compared to RIGHT
+        def filterDiff(left: AbsState, right: AbsState): AbsState = {
             // First compute a naive difference by set diff operator
             val naiveDiff = left.toSet diff right.toSet
 
             // For unchecked cases in naive difference, check for abstract value containment
             val pointwiseDiff = naiveDiff.map(x => {
-                val (cmdL, leftEnv) = x
-                right.get(cmdL) match {
-                    case Some(rightEnv) => leftEnv.map{case (id, leftVal) => rightEnv.get(id) match {
-                        case Some(rightVal) => !(rightVal contain leftVal)
-                        case None => true
-                    }}.foldLeft(false) (_ || _)
-                    case None => true
-                }            
+                val (cmd, leftEnv) = x
+                right.get(cmd) match {
+                    case Some(rightEnv) => {
+                        val envDiff = leftEnv.map{case (id, leftVal) => rightEnv.get(id) match {
+                            case Some(rightVal) => !(rightVal contain leftVal)
+                            case None => true
+                        }}.foldLeft(false) (_ || _)
+                        if(envDiff) Some((cmd, leftEnv))
+                        else None
+                    }
+                    case None => Some((cmd, leftEnv))
+                }
             })
 
-            pointwiseDiff.foldLeft(false) (_ || _)
+            pointwiseDiff.flatten.toMap
         }
 
         /* 
@@ -115,13 +119,15 @@ trait miniCAnalyzer extends miniCControlFlow with miniCError with Parity {
 
         def collect(prev: AbsState, acc: AbsState): AbsState = {
             val cur = transfer(prev)
+            val diff = filterDiff(cur, acc)
 
-            if(diff(cur, acc)) {
-                val pointwiseState = cur.toSet union acc.toSet
+            if(diff.isEmpty) acc
+            else {
+                val pointwiseState = diff.toSet union acc.toSet
                 val partitionState = partition(pointwiseState)
                 val unionState = union(partitionState)
-                collect(cur, unionState)
-            } else acc
+                collect(diff, unionState)
+            }
         }
 
         // Run the framework
@@ -132,7 +138,7 @@ trait miniCAnalyzer extends miniCControlFlow with miniCError with Parity {
 
         finalState
     }
-    def analyze(prog: Program): AbsState = {
+    def analyze_parity(prog: Program): AbsState = {
          // Turn the program into a labelled program, and get the next mappings
         val labelProg = label(prog)
         val nextMap = next(labelProg)
