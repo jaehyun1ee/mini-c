@@ -1,6 +1,6 @@
 package miniC
 
-trait miniCDriver extends miniCParser with miniCCompInterpreter with miniCTransInterpreter with miniCAnalyzerInterval {
+trait miniCDriver extends miniCParser with miniCCompInterpreter with miniCTransInterpreter with miniCAnalyzerParity {
     def run(code: String): Unit = {
         val p: Program = ProgramParser(code)
 
@@ -11,6 +11,6 @@ trait miniCDriver extends miniCParser with miniCCompInterpreter with miniCTransI
         println("\n2. Compositional Style")
         println(interpComp(p))
         println("\n3. (Flow-sensitive) Analysis")
-        analyze_interval(p)
+        analyze_parity(p)
     }
 }

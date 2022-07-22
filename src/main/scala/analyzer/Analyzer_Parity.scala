@@ -87,22 +87,19 @@ trait miniCAnalyzerParity extends miniCControlFlow with miniCError with Parity {
             val naiveDiff = left.toSet diff right.toSet
 
             // For unchecked cases in naive difference, check for abstract value containment
-            val pointwiseDiff = naiveDiff.map(x => {
-                val (cmd, leftEnv) = x
-                right.get(cmd) match {
-                    case Some(rightEnv) => {
-                        val envDiff = leftEnv.map{case (id, leftVal) => rightEnv.get(id) match {
-                            case Some(rightVal) => !(rightVal contain leftVal)
-                            case None => true
-                        }}.foldLeft(false) (_ || _)
-                        if(envDiff) Some((cmd, leftEnv))
-                        else None
-                    }
-                    case None => Some((cmd, leftEnv))
-                }
-            })
+            val pointwiseDiff = for {
+                x <- naiveDiff
+                (cmd, leftEnv) = x
+                if(right.get(cmd) match {
+                    case Some(rightEnv) => leftEnv.map{case (id, leftVal) => rightEnv.get(id) match {
+                        case Some(rightVal) => !(rightVal contain leftVal)
+                        case None => true
+                    }}.foldLeft(false) (_ || _)
+                    case None => true
+                })
+            } yield (cmd ,leftEnv)
 
-            pointwiseDiff.flatten.toMap
+            pointwiseDiff.toMap
         }
 
         /* 
