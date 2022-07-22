@@ -35,8 +35,10 @@ trait IntervalDomain {
     // == operator
     def same(that: IntervalDomain): Option[Boolean] = (this, that) match {
         case (Interval(a, b), Interval(c, d)) => {
-            if(a==c && b==d) Some(true)
-            else Some(false)
+            if(a==b && b==c && c==d) Some(true)
+            else if (b < c) Some(false)
+            else if (a > d) Some(false)
+            else None
         }
         case _ => None
     }
