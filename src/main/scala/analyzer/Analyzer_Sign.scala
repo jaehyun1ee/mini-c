@@ -54,30 +54,30 @@ trait miniCAnalyzerSign extends miniCControlFlow with miniCError with Sign {
             Helper Functions
         */
 
-        // From Map[CmdL, Map[String, Parity]] To Set[(CmdL, Map[String, Parity])]
+        // From Map[CmdL, Map[String, Sign]] To Set[(CmdL, Map[String, Sign])]
         def pointwise(state: AbsState): Set[(CmdL, AbsEnv)] = state.toSet.map((x: (CmdL, AbsEnv)) => {
             val (cmd, env) = x
             analyze(cmd, env, nextMap)
         }).foldLeft(Set[(CmdL, AbsEnv)]()) ((x, y) => x union y)
 
-        // From Set[(CmdL, Map[String, Parity])] To Map[CmdL, Set[Map[String, Parity]]]
+        // From Set[(CmdL, Map[String, Sign])] To Map[CmdL, Set[Map[String, Sign]]]
         def partition(pointwiseState: Set[(CmdL, AbsEnv)]): Map[CmdL, Set[AbsEnv]] = pointwiseState.groupBy((x: (CmdL, AbsEnv)) => x._1).map{case (cmdL, stepRes) => cmdL -> stepRes.map(x => x._2)}
         
-        // From Map[CmdL, Set[Map[String, Parity]]] To Map[CmdL, Map[String, Parity]]
+        // From Map[CmdL, Set[Map[String, Sign]]] To Map[CmdL, Map[String, Sign]]
         def union(partitionState: Map[CmdL, Set[AbsEnv]]): AbsState = partitionState.map{case (cmdL, envS) => {
-            // From Set[Map[String, Parity]] To Set[(String, Parity)]
+            // From Set[Map[String, Sign]] To Set[(String, Sign)]
             val flat = envS.map(x => x.toSet).foldLeft(Set[(String, Sign)]()) ((x, y) => x union y)
 
-            // From Set[(String, Parity)] To Map[String, Set[(String, Parity)]]
+            // From Set[(String, Sign)] To Map[String, Set[(String, Sign)]]
             val transpose = flat.groupBy(x => x._1)
 
-            // From Map[String, Set[(String, Parity)]] To Map[String, Parity]
+            // From Map[String, Set[(String, Sign)]] To Map[String, Sign]
             val acc = transpose.map{case (id, envS) => {
                 val fold = envS.map(x => x._2).foldLeft(Set[Sign]()) ((x, y) => x + y).foldLeft(bottom) ((x, y) => x union y)
                 id -> fold
             }}
             
-            // To Map[CmdL, Map[String, Parity]]
+            // To Map[CmdL, Map[String, Sign]]
             cmdL -> acc
         }}
 
