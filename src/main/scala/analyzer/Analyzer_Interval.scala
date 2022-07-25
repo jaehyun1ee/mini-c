@@ -144,8 +144,6 @@ trait miniCAnalyzerInterval extends miniCControlFlow with miniCError with Interv
          // Turn the program into a labelled program, and get the next mappings
         val labelProg = label(prog)
         val nextMap = next(labelProg)
-        println("a. Labelled AST")
-        println(pretty(labelProg, nextMap) + "\n")
 
         // Run the analysis
         analyze(labelProg, nextMap)

@@ -1,7 +1,8 @@
 package miniC
 
 object Main extends App with miniCDriver {
-    run("input(x); y := x")
+    Grammar.genTest()
+    Tester.start()
     /*
     run("""
         x := 5;
