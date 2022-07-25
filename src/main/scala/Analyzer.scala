@@ -1,7 +1,7 @@
 package miniC
 
 // Flow-sensitive Static Analysis
-abstract class miniCAnalyzer extends miniCControlFlow with miniCError with Abstraction {
+trait miniCAnalyzer extends miniCControlFlow with miniCError with Abstraction {
     /*
         Abstract environment and Abstract State
             - abstract environment: id(string) => abstract value

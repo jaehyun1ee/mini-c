@@ -7,7 +7,7 @@ trait Sign extends Abstraction {
     */
 
     // + operator
-    def +(that: Sign): Sign = (this, that) match {
+    def +(that: Abstraction): Abstraction = (this, that) match {
         case (SignBottom(), SignBottom()) => SignBottom()
 
         case (SignBottom(), Positive()) => Positive()
@@ -71,7 +71,7 @@ trait Sign extends Abstraction {
     }
 
     // - operator
-    def -(that: Sign): Sign = this + (that match {
+    def -(that: Abstraction): Abstraction = this + (that match {
         case Positive() => Negative()
         case Negative() => Positive()
         case Nonpositive() => Nonnegative()
@@ -80,7 +80,7 @@ trait Sign extends Abstraction {
     })
 
     // == operator
-    def same(that: Sign): Option[Boolean] = (this, that) match {
+    def same(that: Abstraction): Option[Boolean] = (this, that) match {
         case (Positive(), Zero()) => Some(false)
         case (Positive(), Negative()) => Some(false)
         case (Positive(), Nonpositive()) => Some(false)
@@ -104,7 +104,7 @@ trait Sign extends Abstraction {
     }
 
     // < operator
-    def lt(that: Sign): Option[Boolean] = (this, that) match {
+    def lt(that: Abstraction): Option[Boolean] = (this, that) match {
         case (Positive(), Zero()) => Some(false)
         case (Positive(), Negative()) => Some(false)
         case (Positive(), Nonpositive()) => Some(false)
@@ -128,7 +128,7 @@ trait Sign extends Abstraction {
     }
 
     // union operator (find an enclosing parity for THIS and THAT)
-    def union(that: Sign): Sign = {
+    def union(that: Abstraction): Abstraction = {
         val thisbools = this match {
             case SignBottom() => (false, false, false)
             case Positive() => (false, false, true)
@@ -162,7 +162,7 @@ trait Sign extends Abstraction {
     }
 
     // contain operator (return true if THIS contains THAT)
-    def contain(that: Sign): Boolean = {
+    def contain(that: Abstraction): Boolean = {
         val thisbools = this match {
             case SignBottom() => (false, false, false)
             case Positive() => (false, false, true)
@@ -186,9 +186,9 @@ trait Sign extends Abstraction {
         (!thisbools._1 || thatbools._1) && (!thisbools._3 || thatbools._3) && (!thisbools._3 || thatbools._3)
     }
 
-    override def abstraction(n: Int) = if (n > 0) Positive() else if (n == 0) Zero() else Negative()
-    override def bottom:Sign = SignBottom()
-    override def top:Sign = SignTop()
+    override def abstraction(n: Int):Abstraction = if (n > 0) Positive() else if (n == 0) Zero() else Negative()
+    override def bottom:Abstraction = SignBottom()
+    override def top:Abstraction = SignTop()
 }
 
 /*
