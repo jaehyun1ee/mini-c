@@ -1,13 +1,13 @@
 package miniC
 
-import miniC.miniCParser.parse
-import miniC.miniCCompInterpreter.{interp => interpComp}
-import miniC.miniCTransInterpreter.{interp => interpTrans}
-import miniC.miniCAnalyzerParity.{analyze => analyzeParity}
-import miniC.miniCAnalyzerInterval.{analyze => analyzeInterval}
-import miniC.miniCAnalyzerSign.{analyze => analyzeSign}
+import miniC.MiniCParser.parse
+import miniC.MiniCCompInterpreter.{interp => interpComp}
+import miniC.MiniCTransInterpreter.{interp => interpTrans}
+import miniC.MiniCAnalyzerParity.{analyze => analyzeParity}
+import miniC.MiniCAnalyzerInterval.{analyze => analyzeInterval}
+import miniC.MiniCAnalyzerSign.{analyze => analyzeSign}
 
-trait miniCDriver {
+trait MiniCDriver {
     def run(code: String): Unit = {
         val program = parse(code)
 

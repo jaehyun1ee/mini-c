@@ -1,6 +1,6 @@
 package miniC
 
-object Main extends App with miniCDriver {
+object Main extends App with MiniCDriver {
     //run("x := 3; y := x")
     run("""
         x := 5;

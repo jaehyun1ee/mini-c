@@ -3,7 +3,7 @@ package miniC
 import scala.io.StdIn.readLine
 
 // Transitional Interpreter of miniC
-class miniCTransInterpreter extends miniCControlFlow with miniCError {
+class MiniCTransInterpreter extends MiniCControlFlow with MiniCError {
     /*
         Define Environment and State
             - environment: id(string) => value(int)
@@ -107,7 +107,7 @@ class miniCTransInterpreter extends miniCControlFlow with miniCError {
     }
 }
 
-object miniCTransInterpreter {
-    val interpreter = new miniCTransInterpreter()
+object MiniCTransInterpreter {
+    lazy val interpreter = new MiniCTransInterpreter()
     def interp(program: Program): String = interpreter.interpTrans(program).toString
 }

@@ -1,7 +1,7 @@
 package miniC
 
 // Extract Control Flow from AST
-trait miniCControlFlow extends miniCLabelAST {
+trait MiniCControlFlow extends MiniCLabelAST {
     /*
         Labelling a Given AST
             - Make a labelled AST out of an AST (to make each command unique)

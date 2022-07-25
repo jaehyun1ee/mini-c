@@ -1,7 +1,7 @@
 package miniC
 
 // Flow-sensitive Static Analysis
-trait miniCAnalyzer extends miniCControlFlow with miniCError with Abstraction {
+trait MiniCAnalyzer extends MiniCControlFlow with MiniCError with Abstraction {
     /*
         Abstract environment and Abstract State
             - abstract environment: id(string) => abstract value
@@ -162,20 +162,20 @@ trait miniCAnalyzer extends miniCControlFlow with miniCError with Abstraction {
     Analyzer Companions on Different Abstractions
 */
 
-class miniCAnalyzerParity extends miniCAnalyzer with Parity
-object miniCAnalyzerParity {
-    val analyzer = new miniCAnalyzerParity()
+class MiniCAnalyzerParity extends MiniCAnalyzer with Parity
+object MiniCAnalyzerParity {
+    lazy val analyzer = new MiniCAnalyzerParity()
     def analyze(program: Program): String = analyzer.analyze(program).toString
 }
 
-class miniCAnalyzerInterval extends miniCAnalyzer with IntervalDomain
-object miniCAnalyzerInterval {
-    val analyzer = new miniCAnalyzerInterval()
+class MiniCAnalyzerInterval extends MiniCAnalyzer with IntervalDomain
+object MiniCAnalyzerInterval {
+    lazy val analyzer = new MiniCAnalyzerInterval()
     def analyze(program: Program): String = analyzer.analyze(program).toString
 }
 
-class miniCAnalyzerSign extends miniCAnalyzer with Sign
-object miniCAnalyzerSign {
-    val analyzer = new miniCAnalyzerSign()
+class MiniCAnalyzerSign extends MiniCAnalyzer with Sign
+object MiniCAnalyzerSign {
+    lazy val analyzer = new MiniCAnalyzerSign()
     def analyze(program: Program): String = analyzer.analyze(program).toString
 }

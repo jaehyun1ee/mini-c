@@ -1,7 +1,7 @@
 package miniC
 
 // AST of miniC
-trait miniCAST {
+trait MiniCAST {
     // Pretty printer
     def pretty(scalarExpr: ScalarExpr): String = scalarExpr match {
         case Num(n) => n.toString
@@ -28,23 +28,23 @@ trait miniCAST {
 }
 
 // Mini C Program
-case class Program(cmd: Cmd) extends miniCAST
+case class Program(cmd: Cmd) extends MiniCAST
 
 // Scalar Expressions
-trait ScalarExpr extends miniCAST // E ::=
+trait ScalarExpr extends MiniCAST // E ::=
 case class Num(num: Int) extends ScalarExpr   // n
 case class Add(left: ScalarExpr, right: ScalarExpr) extends ScalarExpr // e1 + e2
 case class Sub(left: ScalarExpr, right: ScalarExpr) extends ScalarExpr // e1 - e2
 case class Id(name: String) extends ScalarExpr // x
 
 // Boolean Expressions
-trait BoolExpr extends miniCAST // B ::=
+trait BoolExpr extends MiniCAST // B ::=
 case class Bool(bool: Boolean) extends BoolExpr // b
 case class Eq(left: Id, right: Num) extends BoolExpr // x == n
 case class Lt(left: Id, right: Num) extends BoolExpr // x < n
 
 // Commands
-trait Cmd extends miniCAST // C ::=
+trait Cmd extends MiniCAST // C ::=
 case class Skip() extends Cmd // skip;
 case class Seq(head: Cmd, tail: Cmd) extends Cmd // C; C
 case class Assign(name: String, expr: ScalarExpr) extends Cmd // x := E
@@ -53,7 +53,7 @@ case class Branch(cond: BoolExpr, trueBranch: Cmd, falseBranch: Cmd) extends Cmd
 case class While(cond: BoolExpr, body: Cmd) extends Cmd // while(b){c}
 
 // Labelled AST of miniC
-trait miniCLabelAST extends miniCAST {
+trait MiniCLabelAST extends MiniCAST {
     def getLabel(cmdL: CmdL): Int = cmdL match {
         case SkipL(label) => label
         case SeqL(label, _, _) => label
@@ -82,10 +82,10 @@ trait miniCLabelAST extends miniCAST {
 }
 
 // Mini C Program
-case class ProgramL(cmd: CmdL) extends miniCLabelAST
+case class ProgramL(cmd: CmdL) extends MiniCLabelAST
 
 // Commands
-trait CmdL extends miniCLabelAST // C ::=
+trait CmdL extends MiniCLabelAST // C ::=
 case class SkipL(label: Int) extends CmdL // skip;
 case class SeqL(label: Int, head: CmdL, tail: CmdL) extends CmdL // C; C
 case class AssignL(label: Int, name: String, expr: ScalarExpr) extends CmdL // x := E
