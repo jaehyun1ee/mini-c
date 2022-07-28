@@ -2,6 +2,7 @@ package miniC
 
 import scala.util.Random._
 import java.io._
+import scala.language.implicitConversions
 
 object Grammar {
 
@@ -89,16 +90,16 @@ object Grammar {
     val length = nextInt(5)
     def capital = nextInt(2) * 32
     def alpha = (65 + nextInt(26) + capital).toChar
-    val res = alpha + (for (i <- 1 to length) yield {
+    val res = s"$alpha${(for (i <- 1 to length) yield {
       if (nextInt(2) == 0) (48 + nextInt(10)).toChar
       else alpha
-    }).mkString("")
+    }).mkString("")}"
     if (keywords contains res) genId else res
   }
 
   def genTest(): Unit = {
     val testfile = new PrintWriter(new File("tests" ))
-    for(i <- 0 to 100){
+    for(i <- 0 to 1){
         val test = Prod("Commands").testWithDepth(3)
         testfile.write(test + "\n")
     }    

@@ -1,6 +1,6 @@
 package miniC
 
-trait miniCError {
+trait MiniCError {
     case class ParseError(msg: String) extends Error(s"[PARSE ERROR] $msg")
     def parseError[T](msg: String): T = throw ParseError(msg)
 

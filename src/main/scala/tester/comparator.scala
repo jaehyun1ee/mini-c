@@ -1,14 +1,18 @@
 package miniC
 
-trait comparator extends miniCControlFlow with miniCAnalyzerInterval with miniCTransInterpreter{
+import miniC.MiniCParser.parse
 
+// TODO: Use MiniCTransInterpreter, MiniCAnalyzer(Interval) Objects instead of extension.
+//  - the the code should somehow support type aliases outside the trait/class definition.
+trait Comparator extends MiniCTransInterpreter with MiniCAnalyzer {
     def mergeState(state: State): Map[CmdL, Set[TransEnv]] = {
         state.groupBy((x: (CmdL, TransEnv)) => x._1).map{
             case (cmdL, stepRes) => cmdL -> stepRes.map(x => x._2)}
     }
 
-    def isContain(absEnv: AbsEnv, env:TransEnv):Boolean = {
-        env.foldLeft(true){ case (res:Boolean, (key, value)) => {
+    // TODO: Abstract this function for Parity and Sign
+    def isContain(absEnv: AbsEnv, env: TransEnv): Boolean = {
+        env.foldLeft(true){ case (res: Boolean, (key, value)) => {
             val range = absEnv.getOrElse(key, interpError(s"free identifier: $key"))
             range match {
                 case Interval(a, b) => {
@@ -22,15 +26,50 @@ trait comparator extends miniCControlFlow with miniCAnalyzerInterval with miniCT
     }
 
     def diff(absState: AbsState, state: State): Boolean = {
-        val manufacturedState = mergeState(state)
-        val res = (absState.values, manufacturedState.values).zipped.foldLeft(true){
-            case (result, (absEnv, envs)) => {
-                result && (envs.foldLeft(true)((res, env)=>{
-                    res && isContain(absEnv, env)
-                }))
-            }
+        val mergedState = mergeState(state)
+        val cmds = absState.keySet union mergedState.keySet
+        var res = true;
+        for(cmd <- cmds) {
+            (absState.get(cmd), mergedState.get(cmd)) match {
+                case ((Some(absEnv), Some(envS))) => {
+                    println(cmd)
+                    res = res && (envS.foldLeft(true) ((res, env) => {
+                        res && isContain(absEnv, env)
+                    }))
+                }
+                case _ => res = res
+            }   
         }
+
         println(res)
         res
     }
 }
+
+/*
+class ComparatorParity extends Comparator with Parity
+object ComparatorParity extends ComparatorParity {
+    def compare(code: String): Boolean = {
+        val program = parse(code)
+        diff(analyze(program), interpTrans(program))
+    }
+}
+*/
+
+class ComparatorInterval extends Comparator with IntervalDomain
+object ComparatorInterval extends ComparatorInterval {
+    def compare(code: String): Boolean = {
+        val program = parse(code)
+        diff(analyze(program), interpTrans(program))
+    }
+}
+
+/*
+class ComparatorSign extends Comparator with Sign
+object ComparatorSign extends ComparatorSign {
+    def compare(code: String): Boolean = {
+        val program = parse(code)
+        diff(analyze(program), interpTrans(program))
+    }
+}
+*/

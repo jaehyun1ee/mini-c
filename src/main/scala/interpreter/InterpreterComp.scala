@@ -3,7 +3,7 @@ package miniC
 import scala.io.StdIn.readLine
 
 // Compositional Interpreter of miniC
-trait miniCCompInterpreter extends miniCAST with miniCError {
+class MiniCCompInterpreter extends MiniCAST with MiniCError {
     // Environment
     type CompEnv = Map[String, Int]
 
@@ -31,4 +31,9 @@ trait miniCCompInterpreter extends miniCAST with miniCError {
         case While(cond, body) => if(interpComp(cond, env)) interpComp(cmd, interpComp(body, env)) else env
     }
     def interpComp(prog: Program): CompEnv = interpComp(prog.cmd, Map[String, Int]())    
+}
+
+object MiniCCompInterpreter {
+    lazy val interpreter = new MiniCCompInterpreter()
+    def interp(program: Program): String = interpreter.interpComp(program).toString
 }

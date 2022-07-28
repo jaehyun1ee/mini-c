@@ -1,18 +1,38 @@
 package miniC
 
-trait miniCDriver extends miniCParser with miniCCompInterpreter with miniCTransInterpreter with miniCAnalyzerInterval
-with comparator{
-    def run(code: String): Unit = {
-        val p: Program = ProgramParser(code)
+import miniC.MiniCParser.parse
+import miniC.MiniCCompInterpreter.{interp => interpComp}
+import miniC.MiniCTransInterpreter.{interp => interpTrans}
+import miniC.MiniCAnalyzerParity.{analyze => analyzeParity}
+import miniC.MiniCAnalyzerInterval.{analyze => analyzeInterval}
+import miniC.MiniCAnalyzerSign.{analyze => analyzeSign}
 
-        println("\n0. Code")
+object Driver {
+    def run(code: String): Unit = {
+        val program = parse(code)
+
+        println("/*\n\tCode\n*/\n")
         println(code)
-        println("\n1. Transitional Style")
-        val state = interpTrans(p)
-        println("\n2. Compositional Style")
-        println(interpComp(p))
-        println("\n3. (Flow-sensitive) Analysis")
-        val absState = analyze_interval(p)
-        diff(absState, state)
+        println()
+
+        println("/*\n\tInterpret (Compositional) Result\n*/\n")
+        println(interpComp(program))
+        println()
+
+        println("/*\n\tInterpret (Compositional) Result\n*/\n")
+        interpTrans(program)
+        println()
+
+        println("/*\n\tAnalyze (Parity) Result\n*/\n")
+        analyzeParity(program)
+        println()
+
+        println("/*\n\tAnalyze (Interval) Result\n*/\n")
+        analyzeInterval(program)
+        println()
+
+        println("/*\n\tAnalyze (Sign) Result\n*/\n")
+        analyzeSign(program)
+        println()
     }
 }

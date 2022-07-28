@@ -1,7 +1,7 @@
 package miniC
 
 // Extract Control Flow from AST
-trait miniCControlFlow extends miniCLabelAST {
+trait MiniCControlFlow extends MiniCLabelAST {
     /*
         Labelling a Given AST
             - Make a labelled AST out of an AST (to make each command unique)
@@ -74,21 +74,21 @@ trait miniCControlFlow extends miniCLabelAST {
         Pretty Printers for Labelling and Next Result
     */
 
-    def pretty(cmd: CmdL, indent: String, nextMap: NextMap, commentMap: Map[Int, String]): String = {
+    def pretty(cmd: CmdL, indent: String, nextMap: NextMap, commentMap: Map[Int, String], default: String): String = {
         def lookUpNext(opt: Option[Boolean]): Int = getLabel(nextMap.getOrElse((cmd, opt), EOP(-1)))
-        def lookUpComment(label: Int) = commentMap.getOrElse(label, "Unreached")
+        def lookUpComment(label: Int) = commentMap.getOrElse(label, default)
         cmd match {
             case SkipL(label) => indent + s"Skip [$label]=>[${lookUpNext(None)}]" + s"\t // ${lookUpComment(label)}"
-            case SeqL(label, head, tail) => pretty(head, indent, nextMap, commentMap) + "\n" + pretty(tail, indent, nextMap, commentMap)
+            case SeqL(label, head, tail) => pretty(head, indent, nextMap, commentMap, default) + "\n" + pretty(tail, indent, nextMap, commentMap, default)
             case AssignL(label, name, expr) => indent + name + " := " + pretty(expr) + s" [$label]=>[${lookUpNext(None)}]" + s"\t // ${lookUpComment(label)}"
             case InL(label, name) => indent + "input(" + name + ")" + s" [$label]=>[${lookUpNext(None)}]" + s"\t // ${lookUpComment(label)}"
-            case BranchL(label, cond, trueBranch, falseBranch) => indent + "if(" + pretty(cond) + ")" + s" [$label]=>t[${lookUpNext(Some(true))}] f[${lookUpNext(Some(false))}]" + s"\t // ${lookUpComment(label)}\n" + indent + "{\n" + pretty(trueBranch, indent + "   ", nextMap, commentMap) + "\n" + indent + "}\n" + indent + "else {\n" + pretty(falseBranch, indent + "   ", nextMap, commentMap) + "\n" + indent + "}"
-            case WhileL(label, cond, body) => indent + "while(" + pretty(cond) + ")" + s" [$label]=>t[${lookUpNext(Some(true))}] f[${lookUpNext(Some(false))}]" + s"\t // ${lookUpComment(label)}\n" + indent + "{\n" + pretty(body, indent + "   ", nextMap, commentMap) + "\n" + indent + "}"
+            case BranchL(label, cond, trueBranch, falseBranch) => indent + "if(" + pretty(cond) + ")" + s" [$label]=>t[${lookUpNext(Some(true))}] f[${lookUpNext(Some(false))}]" + s"\t // ${lookUpComment(label)}\n" + indent + "{\n" + pretty(trueBranch, indent + "   ", nextMap, commentMap, default) + "\n" + indent + "}\n" + indent + "else {\n" + pretty(falseBranch, indent + "   ", nextMap, commentMap, default) + "\n" + indent + "}"
+            case WhileL(label, cond, body) => indent + "while(" + pretty(cond) + ")" + s" [$label]=>t[${lookUpNext(Some(true))}] f[${lookUpNext(Some(false))}]" + s"\t // ${lookUpComment(label)}\n" + indent + "{\n" + pretty(body, indent + "   ", nextMap, commentMap, default) + "\n" + indent + "}"
             case SOP(label) => s"SOP [$label]=>[${lookUpNext(None)}]" + s"\t // ${lookUpComment(label)}"
             case EOP(label) => s"EOP [$label]" + s"\t // ${lookUpComment(label)}"
         }
     }
     def pretty(prog: ProgramL, nextMap: NextMap): String = {
-        pretty(prog.cmd, "", nextMap, Map[Int, String]())
+        pretty(prog.cmd, "", nextMap, Map[Int, String](), "")
     }
 }
