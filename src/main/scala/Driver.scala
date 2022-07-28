@@ -7,7 +7,7 @@ import miniC.MiniCAnalyzerParity.{analyze => analyzeParity}
 import miniC.MiniCAnalyzerInterval.{analyze => analyzeInterval}
 import miniC.MiniCAnalyzerSign.{analyze => analyzeSign}
 
-trait MiniCDriver {
+object Driver {
     def run(code: String): Unit = {
         val program = parse(code)
 
