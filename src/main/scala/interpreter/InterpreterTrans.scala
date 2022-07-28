@@ -1,9 +1,10 @@
 package miniC
 
 import scala.io.StdIn.readLine
+import scala.util.Random._
 
 // Transitional Interpreter of miniC
-class miniCTransInterpreter extends miniCControlFlow with miniCError {
+class MiniCTransInterpreter extends MiniCControlFlow with MiniCError {
     /*
         Define Environment and State
             - environment: id(string) => value(int)
@@ -37,8 +38,7 @@ class miniCTransInterpreter extends miniCControlFlow with miniCError {
             case SeqL(_, _, _) => (lookUpNext(None), env)
             case AssignL(_, name, expr) => (lookUpNext(None), env + (name -> interpTrans(expr, env)))
             case InL(label, name) => {
-                print(s"[$label] Enter input for $name: ")
-                (lookUpNext(None), env + (name -> readLine().toInt))
+                (lookUpNext(None), env + (name -> nextInt(10)))
             }
             case BranchL(_, cond, _, _) => {
                 if(interpTrans(cond, env)) (lookUpNext(Some(true)), env)
@@ -76,9 +76,6 @@ class miniCTransInterpreter extends miniCControlFlow with miniCError {
         // Turn the program into a labelled program, and get the next mappings
         val labelProg = label(prog)
         val nextMap = next(labelProg)
-        println("a. Labelled AST")
-        println(pretty(labelProg, nextMap) + "\n")
-
         // Run the interpreter
         interpTrans(labelProg, nextMap)
     }
@@ -107,7 +104,7 @@ class miniCTransInterpreter extends miniCControlFlow with miniCError {
     }
 }
 
-object miniCTransInterpreter {
-    val interpreter = new miniCTransInterpreter()
+object MiniCTransInterpreter {
+    lazy val interpreter = new MiniCTransInterpreter()
     def interp(program: Program): String = interpreter.interpTrans(program).toString
 }

@@ -7,7 +7,7 @@ trait Parity extends Abstraction {
     */
 
     // + operator
-    def +(that: Parity): Parity = (this, that) match {
+    def +(that: Abstraction): Abstraction = (this, that) match {
         case (Bottom(), Bottom()) => Bottom()
         case (Bottom(), Even()) => Even()
         case (Bottom(), Odd()) => Odd()
@@ -22,20 +22,20 @@ trait Parity extends Abstraction {
     }
 
     // - operator
-    def -(that: Parity): Parity = this + that
+    def -(that: Abstraction): Abstraction = this + that
 
     // == operator
-    def same(that: Parity): Option[Boolean] = (this, that) match {
+    def same(that: Abstraction): Option[Boolean] = (this, that) match {
         case (Even(), Odd()) => Some(false)
         case (Odd(), Even()) => Some(false)
         case _ => None
     }
 
     // < operator
-    def lt(that: Parity): Option[Boolean] = None
+    def lt(that: Abstraction): Option[Boolean] = None
 
     // union operator (find an enclosing parity for THIS and THAT)
-    def union(that: Parity): Parity = (this, that) match {
+    def union(that: Abstraction): Abstraction = (this, that) match {
         case (Bottom(), Bottom()) => Bottom()
         case (Bottom(), Even()) => Even()
         case (Bottom(), Odd()) => Odd()
@@ -50,7 +50,7 @@ trait Parity extends Abstraction {
     }
 
     // contain operator (return true if THIS contains THAT)
-    def contain(that: Parity): Boolean = (this, that) match {
+    def contain(that: Abstraction): Boolean = (this, that) match {
         case (Top(), Top()) => true
         case (_, Top()) => false
         case (Top(), _) => true
@@ -62,9 +62,9 @@ trait Parity extends Abstraction {
         case _ => false
     }
 
-    override def abstraction(n: Int):Parity = if(n % 2 == 0) Even() else Odd()
-    override def bottom:Parity = Bottom()
-    override def top:Parity = Top()
+    override def abstraction(n: Int):Abstraction = if(n % 2 == 0) Even() else Odd()
+    override def bottom:Abstraction = Bottom()
+    override def top:Abstraction = Top()
 }
 
 /*

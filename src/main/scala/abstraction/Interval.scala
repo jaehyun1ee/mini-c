@@ -7,7 +7,7 @@ trait IntervalDomain extends Abstraction {
     */
 
     // + operator
-    def +(that: IntervalDomain): IntervalDomain = (this, that) match {
+    def +(that: Abstraction): Abstraction = (this, that) match {
         case (IntBottom(), IntBottom()) => IntBottom() // IntBottom + IntBottom case
         case (Interval(a, b), IntBottom()) => Interval(a, b) // IntBottom + _ cases
         case (IntBottom(), Interval(a, b)) => Interval(a, b)
@@ -20,7 +20,7 @@ trait IntervalDomain extends Abstraction {
     }
 
     // - operator
-    def -(that: IntervalDomain): IntervalDomain = (this, that) match {
+    def -(that: Abstraction): Abstraction = (this, that) match {
         case (IntBottom(), IntBottom()) => IntBottom() // IntBottom - IntBottom case
         case (Interval(a, b), IntBottom()) => Interval(a, b) // IntBottom - _ cases
         case (IntBottom(), Interval(a, b)) => Interval(-b, -a)
@@ -33,7 +33,7 @@ trait IntervalDomain extends Abstraction {
     }
 
     // == operator
-    def same(that: IntervalDomain): Option[Boolean] = (this, that) match {
+    def same(that: Abstraction): Option[Boolean] = (this, that) match {
         case (Interval(a, b), Interval(c, d)) => {
             if(a==b && b==c && c==d) Some(true)
             else if (b < c) Some(false)
@@ -44,7 +44,7 @@ trait IntervalDomain extends Abstraction {
     }
 
     // < operator
-    def lt(that: IntervalDomain): Option[Boolean] = (this, that) match {
+    def lt(that: Abstraction): Option[Boolean] = (this, that) match {
         case (Interval(a, b), Interval(c, d)) => {
             if(b < c) Some(true)
             else if(d <= a) Some(false)
@@ -54,7 +54,7 @@ trait IntervalDomain extends Abstraction {
     }
 
     // union operator (find an enclosing interval for THIS and THAT)
-    def union(that: IntervalDomain): IntervalDomain = (this, that) match {
+    def union(that: Abstraction): Abstraction = (this, that) match {
         case (IntBottom(), IntBottom()) => IntBottom()
         case (IntBottom(), Interval(a, b)) => Interval(a, b)
         case (Interval(a, b), IntBottom()) => Interval(a, b)
@@ -80,7 +80,7 @@ trait IntervalDomain extends Abstraction {
     }
 
     // contain operator (return true if THIS contains THAT)
-    def contain(that: IntervalDomain): Boolean = (this, that) match {
+    def contain(that: Abstraction): Boolean = (this, that) match {
         case (IntTop(), IntTop()) => true
         case (_, IntTop()) => false
         case (IntTop(), _) => true
@@ -94,9 +94,9 @@ trait IntervalDomain extends Abstraction {
         case _ => false
     }
 
-    override def abstraction(n: Int):IntervalDomain = Interval(n, n)
-    override def bottom:IntervalDomain = IntBottom()
-    override def top:IntervalDomain = IntTop()
+    override def abstraction(n: Int):Abstraction = Interval(n, n)
+    override def bottom:Abstraction = IntBottom()
+    override def top:Abstraction = IntTop()
 }
 
 /*

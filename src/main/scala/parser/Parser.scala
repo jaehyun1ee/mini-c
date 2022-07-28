@@ -3,7 +3,7 @@ package miniC
 import scala.util.parsing.combinator._
 
 // Parser of miniC
-class miniCParser extends miniCAST with miniCError with RegexParsers with PackratParsers {
+class MiniCParser extends MiniCAST with MiniCError with RegexParsers with PackratParsers {
     object ProgramParser extends ParserObject(prog)
     object ScalarExprParser extends ParserObject(scalarExpr)
     object BoolExprParser extends ParserObject(boolExpr)
@@ -39,7 +39,7 @@ class miniCParser extends miniCAST with miniCError with RegexParsers with Packra
     )
 }
 
-object miniCParser {
-    val parser = new miniCParser()
+object MiniCParser {
+    lazy val parser = new MiniCParser()
     def parse(code: String) = parser.ProgramParser(code)
 }
